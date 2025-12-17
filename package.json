@@ -1,0 +1,16 @@
+{
+  "name": "alldoc",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Node.js app serving static frontend on Azure",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "20.x"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

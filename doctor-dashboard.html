@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>AlloDoc — Doctor Dashboard</title>
+  <link rel="stylesheet" href="./css/style.css"/>
+</head>
+<body>
+<header class="topbar">
+  <div class="container topbar__inner">
+    <div class="brand">
+      <div class="brand__logo">AD</div>
+      <div>
+        <div class="brand__name">Doctor Dashboard</div>
+        <div class="brand__tag">View your appointments</div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <a class="btn" href="./index.html">Doctors</a>
+      <button class="btn" id="btnLogout">Logout</button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <section class="card" style="margin-top:16px;">
+    <div class="card__header">
+      <h2>Your appointments</h2>
+      <div class="small" id="status">—</div>
+    </div>
+
+    <div style="padding: 0 16px 16px;">
+      <button class="btn btn--primary" id="btnRefresh">Refresh</button>
+    </div>
+
+    <div id="apptList" class="apptList" style="padding: 0 16px 16px;"></div>
+  </section>
+</main>
+
+<script type="module" src="./js/doctor-dashboard.js"></script>
+</body>
+</html>
