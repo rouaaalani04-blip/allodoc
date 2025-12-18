@@ -1,62 +1,14 @@
-// ===============================
-// AlloDoc frontend configuration
-// ===============================
+// Browser-side config (NO secrets here)
 
-export const API_BASE =
-  "https://allodoc-functions-bhfshjezgsb2b5d0.spaincentral-01.azurewebsites.net";
+export const ROUTE_DOCTORS = "/api/get_doctors";
+export const ROUTE_APPOINTMENTS = "/api/create_appointment"; // change if your function route differs
+export const ROUTE_DOCTOR_APPTS = "/api/get_doctor_appointments_by_id";
 
-export const FUNCTION_KEY =
-  localStorage.getItem("ALLODOC_FUNCTION_KEY") || "";
-
-// API routes
-export const ROUTE_DOCTORS = "/api/doctors";
-export const ROUTE_APPOINTMENTS = "/api/appointments";
-export const ROUTE_DOCTOR_APPTS = "/api/get_doctor_appointments";
-
-// Build full API URL with optional query params
-export function apiUrl(path, params = {}) {
-  const url = new URL(API_BASE + path);
-
-  if (FUNCTION_KEY) {
-    url.searchParams.set("code", FUNCTION_KEY);
-  }
-
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      url.searchParams.set(key, value);
-    }
+// Builds URL with optional query params
+export function apiUrl(route, params = {}) {
+  const u = new URL(route, window.location.origin);
+  Object.entries(params).forEach(([k, v]) => {
+    if (v !== undefined && v !== null && v !== "") u.searchParams.set(k, v);
   });
-
-  return url.toString();
-}
-// ===============================
-// AlloDoc frontend configuration
-// ===============================
-
-export const API_BASE =
-  "https://allodoc-functions-bhfshjezgsb2b5d0.spaincentral-01.azurewebsites.net";
-
-export const FUNCTION_KEY =
-  localStorage.getItem("ALLODOC_FUNCTION_KEY") || "";
-
-// API routes
-export const ROUTE_DOCTORS = "/api/doctors";
-export const ROUTE_APPOINTMENTS = "/api/appointments";
-export const ROUTE_DOCTOR_APPTS = "/api/get_doctor_appointments";
-
-// Build full API URL with optional query params
-export function apiUrl(path, params = {}) {
-  const url = new URL(API_BASE + path);
-
-  if (FUNCTION_KEY) {
-    url.searchParams.set("code", FUNCTION_KEY);
-  }
-
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      url.searchParams.set(key, value);
-    }
-  });
-
-  return url.toString();
+  return u.toString();
 }
