@@ -1,8 +1,8 @@
 // Browser-side config (NO secrets here)
 
-export const ROUTE_DOCTORS = "/api/get_doctors";
-export const ROUTE_APPOINTMENTS = "/api/create_appointment"; // change if your function route differs
-export const ROUTE_DOCTOR_APPTS = "/api/get_doctor_appointments_by_id";
+export const ROUTE_DOCTORS = "/api/doctors";
+export const ROUTE_APPOINTMENTS = "/api/appointments"; // change if your function route differs
+export const ROUTE_DOCTOR_APPTS = "/api/get_doctor_appointments";
 
 // Builds URL with optional query params
 export function apiUrl(route, params = {}) {
