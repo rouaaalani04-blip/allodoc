@@ -1,72 +1,76 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AlloDoc — Book</title>
-  <link rel="stylesheet" href="./css/style.css"/>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-<header class="topbar">
-  <div class="container topbar__inner">
-    <div class="brand">
-      <div class="brand__logo">AD</div>
-      <div>
-        <div class="brand__name">AlloDoc</div>
-        <div class="brand__tag">Book an appointment</div>
+  <div class="container">
+    <div class="nav">
+      <div class="brand">
+        <a href="index.html">AlloDoc</a>
+        <span class="badge">Booking</span>
+      </div>
+      <div class="nav-links">
+        <a class="btn" href="index.html">Doctors</a>
+        <a class="btn" href="doctor-login.html">Doctor Login</a>
       </div>
     </div>
 
-    <div class="nav">
-      <a class="btn" href="./index.html">← Back to doctors</a>
-      <a class="btn" href="./doctor-login.html">Doctor login</a>
+    <div class="grid">
+      <div class="card">
+        <h1 class="h1">Book an appointment</h1>
+        <p class="p">Fill in the form and submit. (No Function key needed.)</p>
+
+        <label>Doctor ID</label>
+        <input id="doctorId" class="input" placeholder="e.g. 1" />
+
+        <div class="row">
+          <div style="flex:1; min-width:220px">
+            <label>Your full name</label>
+            <input id="patientName" class="input" placeholder="e.g. Rouaa Alani" />
+          </div>
+          <div style="flex:1; min-width:220px">
+            <label>Your email</label>
+            <input id="patientEmail" class="input" placeholder="e.g. user@mail.com" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div style="flex:1; min-width:220px">
+            <label>Date</label>
+            <input id="date" type="date" class="input" />
+          </div>
+          <div style="flex:1; min-width:220px">
+            <label>Time</label>
+            <input id="time" type="time" class="input" />
+          </div>
+        </div>
+
+        <label>Reason / notes</label>
+        <textarea id="notes" rows="3" class="input" placeholder="Describe your symptoms or request..."></textarea>
+
+        <div class="row" style="margin-top:12px">
+          <button id="submit" class="btn primary">Create appointment</button>
+          <button id="load" class="btn">Load doctor appointments</button>
+        </div>
+
+        <div id="toast" class="toast"></div>
+      </div>
+
+      <div class="card">
+        <h2 style="margin:0 0 10px">Doctor’s appointments</h2>
+        <div class="small">This calls: <b>/get_doctor_appointments_by_id?doctorId=...</b></div>
+        <div class="hr"></div>
+        <div id="appointments" class="list"></div>
+      </div>
     </div>
   </div>
-</header>
 
-<main class="container">
-  <section class="card" style="margin-top:16px;">
-    <div class="card__header">
-      <h2>Book appointment</h2>
-      <div class="small" id="status">Loading doctor…</div>
-    </div>
-
-    <div class="selectedDoctorCard" id="docCard" hidden>
-      <img id="docPhoto" class="avatar" alt="Doctor photo"/>
-      <div>
-        <div class="name" id="docName">—</div>
-        <div class="meta" id="docMeta">—</div>
-      </div>
-    </div>
-
-    <form id="bookingForm" class="form" autocomplete="on">
-      <div class="form__row">
-        <label class="label">Patient full name</label>
-        <input id="patientFullName" class="input" type="text" required />
-      </div>
-
-      <div class="form__row">
-        <label class="label">Patient email</label>
-        <input id="patientEmail" class="input" type="email" required />
-      </div>
-
-      <div class="form__row">
-        <label class="label">Patient phone (optional)</label>
-        <input id="patientPhone" class="input" type="tel" />
-      </div>
-
-      <div class="form__row">
-        <label class="label">Appointment date & time</label>
-        <input id="appointmentDateTime" class="input" type="datetime-local" required />
-      </div>
-
-      <button class="btn btn--primary" id="btnBook" type="submit" disabled>Confirm booking</button>
-    </form>
-
-    <div id="resultBox" class="result" hidden></div>
-  </section>
-</main>
-
-<script type="module" src="./js/book.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/book.js"></script>
 </body>
 </html>

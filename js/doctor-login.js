@@ -1,23 +1,17 @@
-import { setDoctorSession, $, escapeHtml } from "./common.js";
+const doctorIdEl = document.getElementById("doctorId");
+const goBtn = document.getElementById("go");
+const toastEl = document.getElementById("toast");
 
-document.addEventListener("DOMContentLoaded", () => {
-  $("loginForm").addEventListener("submit", (e) => {
-    e.preventDefault();
+function toast(msg, kind) {
+  toastEl.className = `toast show ${kind || ""}`;
+  toastEl.textContent = msg;
+}
 
-    const doctorId = Number($("doctorId").value);
-    const password = $("password").value;
+goBtn.addEventListener("click", () => {
+  const doctorId = (doctorIdEl.value || "").trim();
+  if (!doctorId) return toast("Doctor ID is required.", "err");
 
-    // ✅ Demo rule (replace later with real backend auth)
-    if (!doctorId || doctorId < 1) {
-      $("status").textContent = "Invalid doctor ID.";
-      return;
-    }
-    if (password !== "demo") {
-      $("status").textContent = "Wrong password (use demo).";
-      return;
-    }
-
-    setDoctorSession({ doctorId });
-    window.location.href = "./doctor-dashboard.html";
-  });
+  // store session in localStorage
+  localStorage.setItem("ALLODOC_DOCTOR_ID", doctorId);
+  window.location.href = `doctor-dashboard.html`;
 });

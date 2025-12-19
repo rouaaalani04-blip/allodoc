@@ -1,53 +1,43 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AlloDoc — Doctor Login</title>
-  <link rel="stylesheet" href="./css/style.css"/>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-<header class="topbar">
-  <div class="container topbar__inner">
-    <div class="brand">
-      <div class="brand__logo">AD</div>
-      <div>
-        <div class="brand__name">AlloDoc</div>
-        <div class="brand__tag">Doctor portal</div>
+  <div class="container">
+    <div class="nav">
+      <div class="brand">
+        <a href="index.html">AlloDoc</a>
+        <span class="badge">Doctor</span>
+      </div>
+      <div class="nav-links">
+        <a class="btn" href="index.html">Patient View</a>
       </div>
     </div>
 
-    <div class="nav">
-      <a class="btn" href="./index.html">Doctors</a>
+    <div class="card" style="margin-top:18px; max-width:720px">
+      <h1 class="h1">Doctor access</h1>
+      <p class="p">
+        For now (simple version): choose your doctorId and open the dashboard.
+        This avoids putting secrets in the frontend.
+      </p>
+
+      <label>Doctor ID</label>
+      <input id="doctorId" class="input" placeholder="e.g. 1" />
+
+      <div class="row" style="margin-top:12px">
+        <button id="go" class="btn primary">Open dashboard</button>
+      </div>
+
+      <div id="toast" class="toast"></div>
     </div>
   </div>
-</header>
 
-<main class="container">
-  <section class="card" style="margin-top:16px;">
-    <div class="card__header">
-      <h2>Doctor login</h2>
-      <div class="small">Demo login (for now): select your Doctor ID.</div>
-    </div>
-
-    <form class="form" id="loginForm">
-      <div class="form__row">
-        <label class="label">Doctor ID</label>
-        <input id="doctorId" class="input" type="number" min="1" placeholder="e.g., 1" required />
-      </div>
-
-      <div class="form__row">
-        <label class="label">Password</label>
-        <input id="password" class="input" type="password" placeholder="demo" required />
-        <div class="small">For demo: password = <code>demo</code></div>
-      </div>
-
-      <button class="btn btn--primary" type="submit">Login</button>
-      <div class="small" id="status"></div>
-    </form>
-  </section>
-</main>
-
-<script type="module" src="./js/doctor-login.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/doctor-login.js"></script>
 </body>
 </html>

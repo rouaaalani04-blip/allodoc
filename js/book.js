@@ -1,101 +1,109 @@
-import { apiUrl, ROUTE_DOCTORS, ROUTE_APPOINTMENTS } from "./config.js";
-import { $, escapeHtml, toIso8601FromDatetimeLocal } from "./common.js";
+const doctorIdEl = document.getElementById("doctorId");
+const patientNameEl = document.getElementById("patientName");
+const patientEmailEl = document.getElementById("patientEmail");
+const dateEl = document.getElementById("date");
+const timeEl = document.getElementById("time");
+const notesEl = document.getElementById("notes");
 
-let selectedDoctor = null;
+const submitBtn = document.getElementById("submit");
+const loadBtn = document.getElementById("load");
+const toastEl = document.getElementById("toast");
+const apptListEl = document.getElementById("appointments");
 
-function getDoctorIdFromUrl() {
-  const u = new URL(window.location.href);
-  return u.searchParams.get("doctorId");
+function toast(msg, kind) {
+  toastEl.className = `toast show ${kind || ""}`;
+  toastEl.textContent = msg;
 }
 
-function showResult(ok, html) {
-  const box = $("resultBox");
-  box.hidden = false;
-  box.className = "result " + (ok ? "result--ok" : "result--bad");
-  box.innerHTML = html;
+function setFromQuery() {
+  const qDoctorId = qs("doctorId");
+  if (qDoctorId) doctorIdEl.value = qDoctorId;
 }
+setFromQuery();
 
-async function loadDoctor(doctorId) {
-  $("status").textContent = "Loading doctor…";
-  $("btnBook").disabled = true;
-
-  const res = await fetch(apiUrl(ROUTE_DOCTORS));
-  const data = await res.json();
-
-  if (!res.ok || !data.success) throw new Error(data.error || `HTTP ${res.status}`);
-
-  const doctors = data.doctors || [];
-  selectedDoctor = doctors.find(d => String(d.doctorId) === String(doctorId)) || null;
-
-  if (!selectedDoctor) throw new Error("Doctor not found.");
-
-  $("docCard").hidden = false;
-  $("docPhoto").src = selectedDoctor.photoUrl || "";
-  $("docName").textContent = selectedDoctor.fullName;
-  $("docMeta").textContent = `${selectedDoctor.speciality} • Reception: ${selectedDoctor.receptionPhone || "—"}`;
-
-  $("status").textContent = `Booking with doctor #${selectedDoctor.doctorId}.`;
-  $("btnBook").disabled = false;
-}
-
-async function createAppointment(payload) {
-  const res = await fetch(apiUrl(ROUTE_APPOINTMENTS), {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "Accept": "application/json" },
-    body: JSON.stringify(payload)
-  });
-
-  const data = await res.json().catch(() => ({}));
-  return { res, data };
-}
-
-document.addEventListener("DOMContentLoaded", async () => {
-  const doctorId = getDoctorIdFromUrl();
-  if (!doctorId) {
-    $("status").textContent = "Missing doctorId. Go back and select a doctor.";
+function renderAppointments(items) {
+  apptListEl.innerHTML = "";
+  if (!items.length) {
+    apptListEl.innerHTML = `<div class="small">No appointments.</div>`;
     return;
   }
 
+  for (const a of items) {
+    const when = a.datetime ?? a.dateTime ?? a.date ?? a.appointmentDate ?? "";
+    const status = a.status ?? a.etat ?? "Pending";
+    const patient = a.patientName ?? a.patient ?? a.fullName ?? "Patient";
+
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
+      <div class="meta">
+        <div class="title">${patient}</div>
+        <div class="sub">${when || "(no datetime)"} • ${status}</div>
+      </div>
+    `;
+    apptListEl.appendChild(div);
+  }
+}
+
+async function loadAppointments() {
   try {
-    await loadDoctor(doctorId);
-  } catch (e) {
-    $("status").textContent = `Error: ${e.message}`;
-    return;
-  }
+    const doctorId = (doctorIdEl.value || "").trim();
+    if (!doctorId) return toast("Doctor ID is required.", "err");
 
-  $("bookingForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+    toast("Loading appointments...", "");
+    const API = getApiBase();
+
+    const data = await fetchJson(`${API}/get_doctor_appointments_by_id?doctorId=${encodeURIComponent(doctorId)}`);
+    const items = Array.isArray(data) ? data : (data.appointments || data.items || []);
+    renderAppointments(items);
+    toast("Appointments loaded ✅", "ok");
+  } catch (e) {
+    console.error(e);
+    toast(`Error: ${e.message}`, "err");
+  }
+}
+
+async function createAppointment() {
+  try {
+    const doctorId = (doctorIdEl.value || "").trim();
+    const patientName = (patientNameEl.value || "").trim();
+    const patientEmail = (patientEmailEl.value || "").trim();
+    const date = dateEl.value;
+    const time = timeEl.value;
+    const notes = (notesEl.value || "").trim();
+
+    if (!doctorId) return toast("Doctor ID is required.", "err");
+    if (!patientName) return toast("Patient name is required.", "err");
+    if (!date || !time) return toast("Date + Time are required.", "err");
 
     const payload = {
-      doctorId: Number(selectedDoctor.doctorId),
-      patientFullName: $("patientFullName").value.trim(),
-      patientEmail: $("patientEmail").value.trim(),
-      patientPhone: $("patientPhone").value.trim(),
-      appointmentDateTime: toIso8601FromDatetimeLocal($("appointmentDateTime").value)
+      doctorId,
+      patientName,
+      patientEmail,
+      date,
+      time,
+      notes
     };
 
-    $("btnBook").disabled = true;
-    $("status").textContent = "Submitting appointment…";
+    toast("Creating appointment...", "");
+    const API = getApiBase();
 
-    try {
-      const { res, data } = await createAppointment(payload);
+    // assumes your function is POST /create_appointment
+    const data = await fetchJson(`${API}/create_appointment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
 
-      if (res.ok && data.success) {
-        showResult(true, `
-          <strong>✅ Appointment created!</strong><br/>
-          Appointment ID: <code>${escapeHtml(data.appointmentId)}</code><br/>
-          Date & time: <code>${escapeHtml(data.appointmentDateTime)}</code>
-        `);
-        $("status").textContent = "Booked successfully.";
-      } else {
-        showResult(false, `<strong>❌ Failed</strong><br/>${escapeHtml(data.message || `HTTP ${res.status}`)}`);
-        $("status").textContent = "Fix inputs and try again.";
-      }
-    } catch (err) {
-      showResult(false, `<strong>Error:</strong> ${escapeHtml(err.message)}`);
-      $("status").textContent = "Error while booking.";
-    } finally {
-      $("btnBook").disabled = false;
-    }
-  });
-});
+    toast(`Created ✅ ${data.message || ""}`.trim(), "ok");
+
+    // refresh list (if backend stores immediately)
+    await loadAppointments();
+  } catch (e) {
+    console.error(e);
+    toast(`Error: ${e.message}`, "err");
+  }
+}
+
+submitBtn.addEventListener("click", createAppointment);
+loadBtn.addEventListener("click", loadAppointments);
