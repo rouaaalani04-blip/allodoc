@@ -19,61 +19,49 @@
       </div>
     </div>
 
-    <div class="grid">
-      <div class="card">
-        <h1 class="h1">Book an appointment</h1>
-        <p class="p">Fill in the form and submit. (No Function key needed.)</p>
+    <!-- Single card only (no appointments list on booking page) -->
+    <div class="card" style="margin-top:18px; max-width:980px;">
+      <h1 class="h1">Book an appointment</h1>
+      <p class="p">Fill in the form and submit.</p>
 
-        <label>Doctor ID</label>
-        <input id="doctorId" class="input" placeholder="e.g. 1" />
+      <label>Doctor ID</label>
+      <input id="doctorId" class="input" placeholder="e.g. 1" />
 
-        <!-- Name + Email + Phone -->
-        <div class="row">
-          <div style="flex:1; min-width:220px">
-            <label>Your full name</label>
-            <input id="patientName" class="input" placeholder="e.g. Rouaa Alani" />
-          </div>
-
-          <div style="flex:1; min-width:220px">
-            <label>Your email</label>
-            <input id="patientEmail" class="input" placeholder="e.g. user@mail.com" />
-          </div>
-
-          <div style="flex:1; min-width:220px">
-            <label>Your phone</label>
-            <input id="patientPhone" class="input" placeholder="e.g. +212600000000" />
-          </div>
+      <!-- Name + Email + Phone -->
+      <div class="row">
+        <div style="flex:1; min-width:220px">
+          <label>Your full name</label>
+          <input id="patientName" class="input" placeholder="e.g. Rouaa Alani" />
         </div>
 
-        <!-- Date + Time -->
-        <div class="row">
-          <div style="flex:1; min-width:220px">
-            <label>Date</label>
-            <input id="date" type="date" class="input" />
-          </div>
-          <div style="flex:1; min-width:220px">
-            <label>Time</label>
-            <input id="time" type="time" class="input" />
-          </div>
+        <div style="flex:1; min-width:220px">
+          <label>Your email</label>
+          <input id="patientEmail" class="input" placeholder="e.g. user@mail.com" />
         </div>
 
-
-        <div class="row" style="margin-top:12px">
-          <button id="submit" class="btn primary">Create appointment</button>
-          <button id="load" class="btn">Load doctor appointments</button>
+        <div style="flex:1; min-width:220px">
+          <label>Your phone</label>
+          <input id="patientPhone" class="input" placeholder="e.g. +212600000000" />
         </div>
-
-        <div id="toast" class="toast"></div>
       </div>
 
-      <div class="card">
-        <h2 style="margin:0 0 10px">Doctor’s appointments</h2>
-        <div class="small">
-          This calls: <b>/appointments/doctor?doctorId=...</b>
+      <!-- Date + Time -->
+      <div class="row">
+        <div style="flex:1; min-width:220px">
+          <label>Date</label>
+          <input id="date" type="date" class="input" />
         </div>
-        <div class="hr"></div>
-        <div id="appointments" class="list"></div>
+        <div style="flex:1; min-width:220px">
+          <label>Time</label>
+          <input id="time" type="time" class="input" />
+        </div>
       </div>
+
+      <div class="row" style="margin-top:12px">
+        <button id="submit" class="btn primary">Create appointment</button>
+      </div>
+
+      <div id="toast" class="toast"></div>
     </div>
   </div>
 

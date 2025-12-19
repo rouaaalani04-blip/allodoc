@@ -18,23 +18,24 @@ function render(items) {
   }
 
   for (const a of items) {
-    // backend fields: patientFullName, appointmentDateTime, status
-    const when =
-      a.appointmentDateTime ?? a.datetime ?? a.dateTime ?? a.date ?? a.appointmentDate ?? "";
-
-    const status = a.status ?? a.etat ?? "Pending";
-    const patient =
-      a.patientFullName ?? a.patientName ?? a.patient ?? a.fullName ?? "Patient";
-
-    const notes = a.notes ?? a.reason ?? ""; // only if your backend has it
+    const patient = a.patientFullName || "Patient";
+    const when = a.appointmentDateTime || "(no datetime)";
+    const email = a.patientEmail || "";
+    const phone = a.patientPhone || "";
+    const createdAt = a.createdAt || "";
 
     const div = document.createElement("div");
     div.className = "item";
     div.innerHTML = `
       <div class="meta">
         <div class="title">${patient}</div>
-        <div class="sub">${when || "(no datetime)"} • ${status}</div>
-        ${notes ? `<div class="small" style="margin-top:6px">${notes}</div>` : ""}
+        <div class="sub">${when}</div>
+        <div class="small" style="margin-top:6px">
+          ${email ? `${email}` : ""}
+          ${email && phone ? " • " : ""}
+          ${phone ? `${phone}` : ""}
+          ${createdAt ? `<div style="margin-top:4px">Created: ${createdAt}</div>` : ""}
+        </div>
       </div>
     `;
     listEl.appendChild(div);
@@ -49,16 +50,12 @@ async function loadAppointments() {
     toast("Loading appointments...", "");
     const API = getApiBase();
 
-    // ✅ correct route
     const data = await fetchJson(
-      `${API}/get_doctor_appointments?doctorId=${encodeURIComponent(doctorId)}`
+      `${API}/appointments/doctor?doctorId=${encodeURIComponent(doctorId)}`
     );
 
-    // ✅ backend returns { doctorId, count, appointments: [...] }
-    const items = data.appointments || data.items || [];
-    render(items);
-
-    toast("Loaded ✅", "ok");
+    render(data.appointments || []);
+    toast(`Loaded ✅ (${data.count ?? 0})`, "ok");
   } catch (e) {
     console.error(e);
     toast(`Error: ${e.message}`, "err");
@@ -78,5 +75,5 @@ logoutBtn.addEventListener("click", () => {
   window.location.href = "doctor-login.html";
 });
 
-// initial load
+// auto-load
 loadAppointments();

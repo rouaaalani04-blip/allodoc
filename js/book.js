@@ -4,12 +4,9 @@ const patientEmailEl = document.getElementById("patientEmail");
 const patientPhoneEl = document.getElementById("patientPhone");
 const dateEl = document.getElementById("date");
 const timeEl = document.getElementById("time");
-const notesEl = document.getElementById("notes"); // optional, backend may ignore
 
 const submitBtn = document.getElementById("submit");
-const loadBtn = document.getElementById("load");
 const toastEl = document.getElementById("toast");
-const apptListEl = document.getElementById("appointments");
 
 function toast(msg, kind) {
   toastEl.className = `toast show ${kind || ""}`;
@@ -21,65 +18,6 @@ function setFromQuery() {
   if (qDoctorId) doctorIdEl.value = qDoctorId;
 }
 setFromQuery();
-
-function renderAppointments(items) {
-  apptListEl.innerHTML = "";
-
-  if (!Array.isArray(items) || items.length === 0) {
-    apptListEl.innerHTML = `<div class="small">No appointments.</div>`;
-    return;
-  }
-
-  for (const a of items) {
-    const when =
-      a.appointmentDateTime ??
-      a.datetime ??
-      a.dateTime ??
-      a.date ??
-      a.appointmentDate ??
-      "";
-
-    const status = a.status ?? a.etat ?? "Pending";
-    const patient =
-      a.patientFullName ??
-      a.patientName ??
-      a.patient ??
-      a.fullName ??
-      "Patient";
-
-    const div = document.createElement("div");
-    div.className = "item";
-    div.innerHTML = `
-      <div class="meta">
-        <div class="title">${patient}</div>
-        <div class="sub">${when || "(no datetime)"} • ${status}</div>
-      </div>
-    `;
-    apptListEl.appendChild(div);
-  }
-}
-
-async function loadAppointments() {
-  try {
-    const doctorId = (doctorIdEl.value || "").trim();
-    if (!doctorId) return toast("Doctor ID is required.", "err");
-
-    toast("Loading appointments...", "");
-    const API = getApiBase();
-
-    const data = await fetchJson(
-      `${API}/appointments/doctor?doctorId=${encodeURIComponent(doctorId)}`
-    );
-
-    const items = data.appointments || data.items || [];
-    renderAppointments(items);
-
-    toast("Appointments loaded ✅", "ok");
-  } catch (e) {
-    console.error(e);
-    toast(`Error: ${e.message}`, "err");
-  }
-}
 
 async function createAppointment() {
   try {
@@ -118,9 +56,14 @@ async function createAppointment() {
       body: JSON.stringify(payload)
     });
 
-    toast(`Created ✅ ${data.message || ""}`.trim(), "ok");
+    toast(`Appointment created ✅ ${data.message || ""}`.trim(), "ok");
 
-    await loadAppointments();
+    // optional: clear fields after success
+    // patientNameEl.value = "";
+    // patientEmailEl.value = "";
+    // patientPhoneEl.value = "";
+    // dateEl.value = "";
+    // timeEl.value = "";
   } catch (e) {
     console.error(e);
     toast(`Error: ${e.message}`, "err");
@@ -128,4 +71,3 @@ async function createAppointment() {
 }
 
 submitBtn.addEventListener("click", createAppointment);
-loadBtn.addEventListener("click", loadAppointments);
