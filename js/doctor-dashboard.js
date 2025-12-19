@@ -11,16 +11,22 @@ function toast(msg, kind) {
 
 function render(items) {
   listEl.innerHTML = "";
-  if (!items.length) {
+
+  if (!Array.isArray(items) || items.length === 0) {
     listEl.innerHTML = `<div class="small">No appointments.</div>`;
     return;
   }
 
   for (const a of items) {
-    const when = a.datetime ?? a.dateTime ?? a.date ?? a.appointmentDate ?? "";
+    // backend fields: patientFullName, appointmentDateTime, status
+    const when =
+      a.appointmentDateTime ?? a.datetime ?? a.dateTime ?? a.date ?? a.appointmentDate ?? "";
+
     const status = a.status ?? a.etat ?? "Pending";
-    const patient = a.patientName ?? a.patient ?? a.fullName ?? "Patient";
-    const notes = a.notes ?? a.reason ?? "";
+    const patient =
+      a.patientFullName ?? a.patientName ?? a.patient ?? a.fullName ?? "Patient";
+
+    const notes = a.notes ?? a.reason ?? ""; // only if your backend has it
 
     const div = document.createElement("div");
     div.className = "item";
@@ -43,9 +49,15 @@ async function loadAppointments() {
     toast("Loading appointments...", "");
     const API = getApiBase();
 
-    const data = await fetchJson(`${API}/get_doctor_appointments_by_id?doctorId=${encodeURIComponent(doctorId)}`);
-    const items = Array.isArray(data) ? data : (data.appointments || data.items || []);
+    // ✅ correct route
+    const data = await fetchJson(
+      `${API}/get_doctor_appointments?doctorId=${encodeURIComponent(doctorId)}`
+    );
+
+    // ✅ backend returns { doctorId, count, appointments: [...] }
+    const items = data.appointments || data.items || [];
     render(items);
+
     toast("Loaded ✅", "ok");
   } catch (e) {
     console.error(e);
@@ -60,9 +72,11 @@ function initDoctorId() {
 initDoctorId();
 
 loadBtn.addEventListener("click", loadAppointments);
+
 logoutBtn.addEventListener("click", () => {
   localStorage.removeItem("ALLODOC_DOCTOR_ID");
   window.location.href = "doctor-login.html";
 });
 
+// initial load
 loadAppointments();

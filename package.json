@@ -2,6 +2,7 @@
   "name": "medical-appointment-frontend",
   "version": "1.0.0",
   "description": "Medical Appointment Platform",
+  "type": "module",
   "main": "server.js",
   "engines": {
     "node": "20.x"

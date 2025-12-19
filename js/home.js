@@ -11,20 +11,24 @@ function toast(msg, kind) {
 }
 
 function safeDoctorId(d) {
-  return d.doctorId ?? d.id ?? d.DoctorId ?? d.DOCTOR_ID ?? d.ID;
+  return d.doctorId ?? d.id ?? d.DoctorId ?? d.DOCTOR_ID ?? d.ID ?? null;
 }
 
 function render(doctors) {
   listEl.innerHTML = "";
-  if (!doctors.length) {
+
+  if (!Array.isArray(doctors) || doctors.length === 0) {
     listEl.innerHTML = `<div class="small">No doctors found.</div>`;
     return;
   }
 
   for (const d of doctors) {
     const doctorId = safeDoctorId(d);
-    const name = d.name ?? d.fullName ?? d.nom ?? "Doctor";
-    const specialty = d.specialty ?? d.specialite ?? d.service ?? "Specialty";
+
+    // ✅ backend fields: fullName, speciality, photoUrl, doctorId
+    const name = d.fullName ?? d.name ?? d.nom ?? "Doctor";
+    const specialty =
+      d.specialty ?? d.speciality ?? d.specialite ?? d.service ?? "Specialty";
     const city = d.city ?? d.ville ?? d.location ?? "";
     const img = d.photoUrl ?? d.photo_url ?? d.imageUrl ?? d.image_url ?? "";
 
@@ -39,7 +43,9 @@ function render(doctors) {
         <div class="small">Doctor ID: ${doctorId ?? "?"}</div>
       </div>
       <div class="right">
-        <a class="btn primary" href="book.html?doctorId=${encodeURIComponent(doctorId ?? "")}">Book</a>
+        <a class="btn primary" href="book.html?doctorId=${encodeURIComponent(
+          doctorId ?? ""
+        )}">Book</a>
       </div>
     `;
 
@@ -51,9 +57,13 @@ async function loadDoctors() {
   try {
     toast("Loading doctors...", "");
     const API = getApiBase();
-    const data = await fetchJson(`${API}/get_doctors`);
-    // backend may return {doctors:[...]} or directly [...]
+
+    // ✅ correct route from your backend contract
+    const data = await fetchJson(`${API}/doctors`);
+
+    // ✅ backend returns { doctors: [...] }
     allDoctors = Array.isArray(data) ? data : (data.doctors || data.items || []);
+
     render(allDoctors);
     toast("Doctors loaded ✅", "ok");
   } catch (e) {
@@ -66,13 +76,23 @@ searchEl.addEventListener("input", () => {
   const q = (searchEl.value || "").toLowerCase().trim();
   if (!q) return render(allDoctors);
 
-  const filtered = allDoctors.filter(d => {
-    const name = (d.name ?? d.fullName ?? d.nom ?? "").toLowerCase();
-    const sp = (d.specialty ?? d.specialite ?? d.service ?? "").toLowerCase();
+  const filtered = allDoctors.filter((d) => {
+    const name = (d.fullName ?? d.name ?? d.nom ?? "").toLowerCase();
+    const sp = (
+      d.specialty ??
+      d.speciality ??
+      d.specialite ??
+      d.service ??
+      ""
+    ).toLowerCase();
+
     return name.includes(q) || sp.includes(q);
   });
+
   render(filtered);
 });
 
 reloadBtn.addEventListener("click", loadDoctors);
+
+// initial load
 loadDoctors();

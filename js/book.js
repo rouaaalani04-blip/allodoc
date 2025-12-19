@@ -3,7 +3,7 @@ const patientNameEl = document.getElementById("patientName");
 const patientEmailEl = document.getElementById("patientEmail");
 const dateEl = document.getElementById("date");
 const timeEl = document.getElementById("time");
-const notesEl = document.getElementById("notes");
+const notesEl = document.getElementById("notes"); // optional, backend may ignore
 
 const submitBtn = document.getElementById("submit");
 const loadBtn = document.getElementById("load");
@@ -23,15 +23,20 @@ setFromQuery();
 
 function renderAppointments(items) {
   apptListEl.innerHTML = "";
-  if (!items.length) {
+
+  if (!Array.isArray(items) || items.length === 0) {
     apptListEl.innerHTML = `<div class="small">No appointments.</div>`;
     return;
   }
 
   for (const a of items) {
-    const when = a.datetime ?? a.dateTime ?? a.date ?? a.appointmentDate ?? "";
+    // backend returns: appointmentId, doctorId, patientFullName, patientEmail, patientPhone, appointmentDateTime, status
+    const when =
+      a.appointmentDateTime ?? a.datetime ?? a.dateTime ?? a.date ?? a.appointmentDate ?? "";
+
     const status = a.status ?? a.etat ?? "Pending";
-    const patient = a.patientName ?? a.patient ?? a.fullName ?? "Patient";
+    const patient =
+      a.patientFullName ?? a.patientName ?? a.patient ?? a.fullName ?? "Patient";
 
     const div = document.createElement("div");
     div.className = "item";
@@ -53,9 +58,15 @@ async function loadAppointments() {
     toast("Loading appointments...", "");
     const API = getApiBase();
 
-    const data = await fetchJson(`${API}/get_doctor_appointments_by_id?doctorId=${encodeURIComponent(doctorId)}`);
-    const items = Array.isArray(data) ? data : (data.appointments || data.items || []);
+    // ✅ correct route from your backend contract
+    const data = await fetchJson(
+      `${API}/get_doctor_appointments?doctorId=${encodeURIComponent(doctorId)}`
+    );
+
+    // ✅ backend returns { doctorId, count, appointments: [...] }
+    const items = data.appointments || data.items || [];
     renderAppointments(items);
+
     toast("Appointments loaded ✅", "ok");
   } catch (e) {
     console.error(e);
@@ -65,31 +76,39 @@ async function loadAppointments() {
 
 async function createAppointment() {
   try {
-    const doctorId = (doctorIdEl.value || "").trim();
-    const patientName = (patientNameEl.value || "").trim();
+    const doctorIdRaw = (doctorIdEl.value || "").trim();
+    const patientFullName = (patientNameEl.value || "").trim();
     const patientEmail = (patientEmailEl.value || "").trim();
     const date = dateEl.value;
     const time = timeEl.value;
-    const notes = (notesEl.value || "").trim();
+    const notes = (notesEl.value || "").trim(); // optional
 
-    if (!doctorId) return toast("Doctor ID is required.", "err");
-    if (!patientName) return toast("Patient name is required.", "err");
+    if (!doctorIdRaw) return toast("Doctor ID is required.", "err");
+    if (!patientFullName) return toast("Patient name is required.", "err");
     if (!date || !time) return toast("Date + Time are required.", "err");
 
+    const doctorId = Number(doctorIdRaw);
+    if (Number.isNaN(doctorId)) return toast("Doctor ID must be a number.", "err");
+
+    // ✅ backend expects a single ISO datetime string (appointmentDateTime)
+    const appointmentDateTime = `${date}T${time}:00`;
+
+    // ✅ backend required keys
     const payload = {
       doctorId,
-      patientName,
+      patientFullName,
       patientEmail,
-      date,
-      time,
-      notes
+      patientPhone: "",          // add an input later if you want
+      appointmentDateTime
+      // notes is not in the backend contract; keep only if your backend supports it:
+      // notes
     };
 
     toast("Creating appointment...", "");
     const API = getApiBase();
 
-    // assumes your function is POST /create_appointment
-    const data = await fetchJson(`${API}/create_appointment`, {
+    // ✅ correct route from your backend contract
+    const data = await fetchJson(`${API}/appointments`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
@@ -97,7 +116,7 @@ async function createAppointment() {
 
     toast(`Created ✅ ${data.message || ""}`.trim(), "ok");
 
-    // refresh list (if backend stores immediately)
+    // refresh
     await loadAppointments();
   } catch (e) {
     console.error(e);

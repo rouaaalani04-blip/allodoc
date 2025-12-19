@@ -1,44 +1,42 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AlloDoc — Doctor Dashboard</title>
-  <link rel="stylesheet" href="./css/style.css"/>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-<header class="topbar">
-  <div class="container topbar__inner">
-    <div class="brand">
-      <div class="brand__logo">AD</div>
-      <div>
-        <div class="brand__name">Doctor Dashboard</div>
-        <div class="brand__tag">View your appointments</div>
+  <div class="container">
+    <div class="nav">
+      <div class="brand">
+        <a href="index.html">AlloDoc</a>
+        <span class="badge">Doctor Dashboard</span>
+      </div>
+      <div class="nav-links">
+        <a class="btn" href="index.html">Doctors</a>
+        <button id="logout" class="btn danger">Logout</button>
       </div>
     </div>
 
-    <div class="nav">
-      <a class="btn" href="./index.html">Doctors</a>
-      <button class="btn" id="btnLogout">Logout</button>
+    <div class="card" style="margin-top:18px">
+      <h1 class="h1">Your appointments</h1>
+      <p class="p">Loads from <b>/get_doctor_appointments?doctorId=...</b></p>
+
+      <div class="row">
+        <input id="doctorId" class="input" placeholder="Doctor ID" />
+        <button id="load" class="btn primary">Load</button>
+      </div>
+
+      <div id="toast" class="toast"></div>
+      <div class="hr"></div>
+      <div id="appointments" class="list"></div>
     </div>
   </div>
-</header>
 
-<main class="container">
-  <section class="card" style="margin-top:16px;">
-    <div class="card__header">
-      <h2>Your appointments</h2>
-      <div class="small" id="status">—</div>
-    </div>
-
-    <div style="padding: 0 16px 16px;">
-      <button class="btn btn--primary" id="btnRefresh">Refresh</button>
-    </div>
-
-    <div id="apptList" class="apptList" style="padding: 0 16px 16px;"></div>
-  </section>
-</main>
-
-<script type="module" src="./js/doctor-dashboard.js"></script>
+  <!-- IMPORTANT: load these first -->
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/doctor-dashboard.js"></script>
 </body>
 </html>
