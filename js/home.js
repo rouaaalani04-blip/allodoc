@@ -25,7 +25,7 @@ function render(doctors) {
   for (const d of doctors) {
     const doctorId = safeDoctorId(d);
 
-    // ✅ backend fields: fullName, speciality, photoUrl, doctorId
+    // backend fields: fullName, speciality, photoUrl, doctorId
     const name = d.fullName ?? d.name ?? d.nom ?? "Doctor";
     const specialty =
       d.specialty ?? d.speciality ?? d.specialite ?? d.service ?? "Specialty";
@@ -58,14 +58,14 @@ async function loadDoctors() {
     toast("Loading doctors...", "");
     const API = getApiBase();
 
-    // ✅ correct route from your backend contract
+    // correct route from your backend contract
     const data = await fetchJson(`${API}/doctors`);
 
-    // ✅ backend returns { doctors: [...] }
+    // backend returns { doctors: [...] }
     allDoctors = Array.isArray(data) ? data : (data.doctors || data.items || []);
 
     render(allDoctors);
-    toast("Doctors loaded ✅", "ok");
+    toast("Doctors loaded", "ok");
   } catch (e) {
     console.error(e);
     toast(`Error: ${e.message}`, "err");

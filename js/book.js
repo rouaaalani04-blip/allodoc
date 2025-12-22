@@ -56,7 +56,7 @@ async function createAppointment() {
       body: JSON.stringify(payload)
     });
 
-    toast(`Appointment created ✅ ${data.message || ""}`.trim(), "ok");
+    toast(`Appointment created: ${data.message || ""}`.trim(), "ok");
 
     // optional: clear fields after success
     // patientNameEl.value = "";

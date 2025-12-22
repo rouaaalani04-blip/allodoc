@@ -55,7 +55,7 @@ async function loadAppointments() {
     );
 
     render(data.appointments || []);
-    toast(`Loaded ✅ (${data.count ?? 0})`, "ok");
+    toast(`Loaded: (${data.count ?? 0})`, "ok");
   } catch (e) {
     console.error(e);
     toast(`Error: ${e.message}`, "err");
